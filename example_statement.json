@@ -1,0 +1,31 @@
+{
+  "matter": {
+    "matter_id": "MAT-2048",
+    "client_reference": "CLIENT-77",
+    "opened_on": "2026-08-12",
+    "practice_area": "Commercial contracts"
+  },
+  "signed_delivery": {
+    "document_label": "Engagement letter",
+    "signed_on": "2026-08-13",
+    "delivered_on": "2026-08-13"
+  },
+  "deadline": {
+    "label": "File disclosure",
+    "due_on": "2026-09-14",
+    "completed_on": null
+  },
+  "entries": [
+    {
+      "posted_on": "2026-08-12",
+      "description": "Matter intake and conflict review",
+      "amount": "180.00"
+    },
+    {
+      "posted_on": "2026-08-13",
+      "description": "Engagement document preparation",
+      "amount": "240.00"
+    }
+  ],
+  "as_of_date": "2026-09-08"
+}
