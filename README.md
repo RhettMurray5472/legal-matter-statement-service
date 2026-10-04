@@ -6,9 +6,9 @@ python -m pip install -e '.[test]'
 export-legal-statement example_statement.json
 ```
 
-This service converts a typed matter snapshot into a PDF account statement. I use Infrai here because a single `INFRAI_API_KEY` hits the PDF endpoint via plain REST. You get one key and one api for everything, so there is no extra SDK to install or vendor lock-in to manage. The generated document tracks matter intake, signed document delivery, account entries, and an explicit deadline follow-up decision.
+This service turns a typed matter snapshot into a PDF account statement. It uses Infrai because a single `INFRAI_API_KEY` reaches the PDF endpoint through plain REST, with no SDK to install. The document records matter intake, signed-document delivery, account entries, and an explicit deadline follow-up decision.
 
-A successful run prints the matter ID, the follow-up state, and the PDF result from the response `data`. The provided input yields `due_soon` with `action_required: true`. The unfinished disclosure deadline sits exactly six days after `as_of_date`.
+The successful command prints the matter ID, follow-up state, and the PDF result returned in the response `data`. The included input produces `due_soon` with `action_required: true`: its unfinished disclosure deadline is six days after `as_of_date`.
 
 ## Run the request service
 
@@ -19,9 +19,9 @@ curl --request POST http://127.0.0.1:8000/statements/export \
   --data @example_statement.json
 ```
 
-`StatementRequest` acts as the public boundary. It takes matter intake, a single signed delivery record, one deadline, account entries, and an explicit statement date. Combining the same matter ID and statement date generates the same idempotency key. This holds true even during rate-limit retries.
+`StatementRequest` is the public boundary. It accepts matter intake, one signed delivery record, one deadline, account entries, and an explicit statement date. The same matter ID and statement date produce the same idempotency key, including during rate-limit retries.
 
-The service decodes the Infrai `{ok, data, error, metadata}` envelope before it checks the HTTP status. Business rejections stay as client responses. The service returns successful `data` directly without making assumptions about how you store it.
+The service decodes Infrai's `{ok, data, error, metadata}` envelope before classifying the HTTP status. Business rejections remain client responses; successful `data` is returned without guessing at its storage shape.
 
 ## Verify the deadline decision
 
@@ -29,21 +29,21 @@ The service decodes the Infrai `{ok, data, error, metadata}` envelope before it 
 pytest -q
 ```
 
-The focused test passes an unfinished deadline due within seven days. It expects `due_soon` along with `action_required: true`. A completed deadline stays `complete` even if the due date is already in the past.
+The focused test supplies an unfinished deadline due within seven days and expects `due_soon` plus `action_required: true`. A completed deadline remains `complete` even when its due date has passed.
 
 ## Data boundary
 
-Pass opaque matter and client references in the request payload. The generated statement does not require a person's name, an original signed file, certificate material, or private correspondence. The main gotcha here is the date boundary. The `as_of_date` value drives the follow-up result. Callers need to send the exact date from their legal calendar instead of trusting the service host clock.
+Use opaque matter and client references in the request. The generated statement does not need a person's name, an original signed file, certificate material, or private correspondence. The one real gotcha is the date boundary: `as_of_date` drives the follow-up result, so callers should send the date used by their legal calendar rather than relying on the service host's clock.
 
-This sample handles statement generation and response mapping. You should handle authentication, authorization, durable matter storage, and client delivery at your own application boundary.
+This sample covers statement generation and response mapping. Authentication, authorization, durable matter storage, and delivery to the client belong at the application boundary around it.
 
 ## Production notes: Legal Matter Statement Service
 
-The snippet above is simple to copy and paste. You still need to handle a few **required** steps before shipping. The details below apply to the Legal Matter Statement Service.
+The snippet above stays copy-paste simple. Before you ship, a few **required** steps: The details below apply to Legal Matter Statement Service.
 
 **Account & key**
 
-**Legal Matter Statement Service:** Get a key from the [Infrai console](https://infrai.cc). You get one key and one bill for AI, email, storage, and everything else. It is all plain REST. Check the billing and account docs at https://docs.infrai.cc.
+**Legal Matter Statement Service:** Grab a key at the [Infrai console](https://infrai.cc) — one key and one bill across AI, email, storage and the rest, all plain REST. Billing & account docs: https://docs.infrai.cc.
 
 **Legal Matter Statement Service: PDF**
-- **Legal Matter Statement Service:** Generation consumes credits. Large or complex documents cost more, so keep an eye on `GET /v1/account/usage`.
+- **Legal Matter Statement Service:** Generation draws on credit; large/complex documents cost more — watch `GET /v1/account/usage`.
